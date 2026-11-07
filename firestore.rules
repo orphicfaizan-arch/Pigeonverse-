@@ -1,0 +1,274 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Default deny catch-all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helper Primitives
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(uid) {
+      return isSignedIn() && request.auth.uid == uid;
+    }
+
+    function isAdmin() {
+      return isSignedIn() && request.auth.token.email == "orphicfaizan@gmail.com";
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() > 0 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    // Validation Helpers
+    function isValidUser(data) {
+      return data.userId is string && data.userId == request.auth.uid &&
+             data.displayName is string && data.displayName.size() >= 1 && data.displayName.size() <= 100 &&
+             (!('email' in data) || (data.email is string && data.email.size() <= 150)) &&
+             (!('photoUrl' in data) || data.photoUrl == null || (data.photoUrl is string && data.photoUrl.size() <= 1000)) &&
+             (!('loftName' in data) || (data.loftName is string && data.loftName.size() <= 100)) &&
+             (!('isBreeder' in data) || data.isBreeder is bool) &&
+             (!('isVerifiedBreeder' in data) || data.isVerifiedBreeder is bool) &&
+             (!('location' in data) || (data.location is string && data.location.size() <= 150)) &&
+             (!('bio' in data) || (data.bio is string && data.bio.size() <= 1000)) &&
+             (!('phone' in data) || (data.phone is string && data.phone.size() <= 50)) &&
+             (!('subscriptionTier' in data) || (data.subscriptionTier is string && data.subscriptionTier.size() <= 50)) &&
+             (!('isAdmin' in data) || data.isAdmin is bool);
+    }
+
+    function isValidPigeon(data) {
+      return data.sellerId is string && data.sellerId == request.auth.uid &&
+             data.title is string && data.title.size() >= 2 && data.title.size() <= 150 &&
+             data.breed is string && data.breed.size() >= 2 && data.breed.size() <= 100 &&
+             data.price is number && data.price >= 0 &&
+             data.status is string && (data.status == 'available' || data.status == 'reserved' || data.status == 'sold') &&
+             (!('sellerName' in data) || (data.sellerName is string && data.sellerName.size() <= 100)) &&
+             (!('sellerLoft' in data) || (data.sellerLoft is string && data.sellerLoft.size() <= 100)) &&
+             (!('gender' in data) || (data.gender is string && data.gender.size() <= 20)) &&
+             (!('ringNumber' in data) || (data.ringNumber is string && data.ringNumber.size() <= 50)) &&
+             (!('birthYear' in data) || data.birthYear is int) &&
+             (!('colorMorph' in data) || (data.colorMorph is string && data.colorMorph.size() <= 80)) &&
+             (!('location' in data) || (data.location is string && data.location.size() <= 150)) &&
+             (!('description' in data) || (data.description is string && data.description.size() <= 2000)) &&
+             (!('imageUrl' in data) || data.imageUrl == null || (data.imageUrl is string && data.imageUrl.size() <= 1000)) &&
+             (!('videoUrl' in data) || data.videoUrl == null || (data.videoUrl is string && data.videoUrl.size() <= 1000)) &&
+             (!('vaccinated' in data) || data.vaccinated is bool) &&
+             (!('pedigreeAvailable' in data) || data.pedigreeAvailable is bool) &&
+             (!('healthStatus' in data) || (data.healthStatus is string && data.healthStatus.size() <= 100));
+    }
+
+
+    function isValidStore(data) {
+      return data.ownerId is string && data.ownerId == request.auth.uid &&
+             data.storeName is string && data.storeName.size() >= 2 && data.storeName.size() <= 100 &&
+             (!('ownerName' in data) || (data.ownerName is string && data.ownerName.size() <= 100)) &&
+             (!('tagline' in data) || (data.tagline is string && data.tagline.size() <= 200)) &&
+             (!('description' in data) || (data.description is string && data.description.size() <= 2000)) &&
+             (!('location' in data) || (data.location is string && data.location.size() <= 150)) &&
+             (!('city' in data) || (data.city is string && data.city.size() <= 100)) &&
+             (!('stateRegion' in data) || (data.stateRegion is string && data.stateRegion.size() <= 100)) &&
+             (!('distanceKm' in data) || (data.distanceKm is number && data.distanceKm >= 0)) &&
+             (!('pincode' in data) || (data.pincode is string && data.pincode.size() <= 20)) &&
+             (!('upiId' in data) || (data.upiId is string && data.upiId.size() <= 100)) &&
+             (!('acceptsInrUpi' in data) || data.acceptsInrUpi is bool) &&
+             (!('bannerUrl' in data) || data.bannerUrl == null || (data.bannerUrl is string && data.bannerUrl.size() <= 1000)) &&
+             (!('logoUrl' in data) || data.logoUrl == null || (data.logoUrl is string && data.logoUrl.size() <= 1000)) &&
+             (!('verified' in data) || data.verified is bool) &&
+             (!('totalSales' in data) || data.totalSales is int) &&
+             (!('rating' in data) || data.rating is number);
+    }
+
+    function isValidAppointment(data) {
+      return data.userId is string && data.userId == request.auth.uid &&
+             data.doctorId is string && data.doctorId.size() <= 100 &&
+             data.date is string && data.date.size() <= 30 &&
+             data.timeSlot is string && data.timeSlot.size() <= 30 &&
+             data.status is string && (data.status == 'pending' || data.status == 'confirmed' || data.status == 'completed' || data.status == 'cancelled') &&
+             (!('userName' in data) || (data.userName is string && data.userName.size() <= 100)) &&
+             (!('doctorName' in data) || (data.doctorName is string && data.doctorName.size() <= 100)) &&
+             (!('specialty' in data) || (data.specialty is string && data.specialty.size() <= 100)) &&
+             (!('consultType' in data) || (data.consultType is string && data.consultType.size() <= 50)) &&
+             (!('fee' in data) || (data.fee is number && data.fee >= 0)) &&
+             (!('notes' in data) || (data.notes is string && data.notes.size() <= 1000));
+    }
+
+    function isValidOrder(data) {
+      return data.buyerId is string && data.buyerId == request.auth.uid &&
+             data.sellerId is string && data.sellerId.size() <= 128 &&
+             data.pigeonId is string && data.pigeonId.size() <= 128 &&
+             data.amount is number && data.amount >= 0 &&
+             data.status is string && (data.status == 'placed' || data.status == 'escrow_held' || data.status == 'transport_booked' || data.status == 'delivered' || data.status == 'completed' || data.status == 'cancelled') &&
+             (!('buyerName' in data) || (data.buyerName is string && data.buyerName.size() <= 100)) &&
+             (!('pigeonTitle' in data) || (data.pigeonTitle is string && data.pigeonTitle.size() <= 150)) &&
+             (!('paymentMethod' in data) || (data.paymentMethod is string && data.paymentMethod.size() <= 100)) &&
+             (!('currency' in data) || (data.currency is string && data.currency.size() <= 10)) &&
+             (!('inrAmount' in data) || (data.inrAmount is number && data.inrAmount >= 0)) &&
+             (!('upiTransactionId' in data) || (data.upiTransactionId is string && data.upiTransactionId.size() <= 100)) &&
+             (!('securityVerificationCode' in data) || (data.securityVerificationCode is string && data.securityVerificationCode.size() <= 30)) &&
+             (!('escrowStatus' in data) || (data.escrowStatus is string && data.escrowStatus.size() <= 50)) &&
+             (!('deliveryAddress' in data) || (data.deliveryAddress is string && data.deliveryAddress.size() <= 300));
+    }
+
+    function isValidConversation(data) {
+      return data.buyerId is string && data.sellerId is string &&
+             (data.buyerId == request.auth.uid || data.sellerId == request.auth.uid) &&
+             (!('buyerName' in data) || (data.buyerName is string && data.buyerName.size() <= 100)) &&
+             (!('sellerName' in data) || (data.sellerName is string && data.sellerName.size() <= 100)) &&
+             (!('pigeonPrice' in data) || (data.pigeonPrice is number && data.pigeonPrice >= 0)) &&
+             (!('pigeonBreed' in data) || (data.pigeonBreed is string && data.pigeonBreed.size() <= 100)) &&
+             (!('participantIds' in data) || (data.participantIds is string && data.participantIds.size() <= 300)) &&
+             (!('pigeonId' in data) || (data.pigeonId is string && data.pigeonId.size() <= 128)) &&
+             (!('pigeonTitle' in data) || (data.pigeonTitle is string && data.pigeonTitle.size() <= 150)) &&
+             (!('lastMessage' in data) || (data.lastMessage is string && data.lastMessage.size() <= 500));
+    }
+
+    function isValidMessage(data) {
+      return data.conversationId is string && data.conversationId.size() <= 128 &&
+             data.senderId is string && data.senderId == request.auth.uid &&
+             data.text is string && data.text.size() >= 1 && data.text.size() <= 1000 &&
+             (!('senderName' in data) || (data.senderName is string && data.senderName.size() <= 100)) &&
+             (!('messageType' in data) || (data.messageType is string && data.messageType.size() <= 50)) &&
+             (!('offerAmount' in data) || (data.offerAmount is number && data.offerAmount >= 0)) &&
+             (!('isBreeder' in data) || data.isBreeder is bool);
+    }
+
+    // 1. Users Collection
+    match /users/{userId} {
+      allow get: if isSignedIn();
+      allow list: if isSignedIn() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow create: if isOwner(userId) &&
+                       isValidUser(incoming()) &&
+                       incoming().createdAt is timestamp &&
+                       incoming().createdAt <= request.time;
+      allow update: if (isOwner(userId) || isAdmin()) &&
+                       incoming().userId == existing().userId &&
+                       incoming().createdAt == existing().createdAt &&
+                       isValidUser(incoming()) &&
+                       (isAdmin() || !('isAdmin' in incoming()) || incoming().isAdmin == existing().isAdmin) &&
+                       incoming().updatedAt is timestamp &&
+                       incoming().updatedAt <= request.time;
+      allow delete: if isAdmin();
+    }
+
+    // 2. Pigeons Collection (Marketplace & Inventory)
+    match /pigeons/{pigeonId} {
+      allow get: if isSignedIn();
+      allow list: if isSignedIn();
+      allow create: if isSignedIn() &&
+                       isValidPigeon(incoming()) &&
+                       incoming().createdAt is timestamp &&
+                       incoming().createdAt <= request.time;
+      allow update: if (isOwner(existing().sellerId) || isAdmin()) &&
+                       incoming().sellerId == existing().sellerId &&
+                       incoming().createdAt == existing().createdAt &&
+                       isValidPigeon(incoming()) &&
+                       incoming().updatedAt is timestamp &&
+                       incoming().updatedAt <= request.time;
+      allow delete: if isOwner(existing().sellerId) || isAdmin();
+    }
+
+    // 3. Stores Collection
+    match /stores/{storeId} {
+      allow get: if isSignedIn();
+      allow list: if isSignedIn();
+      allow create: if isSignedIn() &&
+                       isValidStore(incoming()) &&
+                       incoming().createdAt is timestamp &&
+                       incoming().createdAt <= request.time;
+      allow update: if (isOwner(existing().ownerId) || isAdmin()) &&
+                       incoming().ownerId == existing().ownerId &&
+                       incoming().createdAt == existing().createdAt &&
+                       isValidStore(incoming()) &&
+                       incoming().updatedAt is timestamp &&
+                       incoming().updatedAt <= request.time;
+      allow delete: if isOwner(existing().ownerId) || isAdmin();
+    }
+
+    // 4. Doctors Collection
+    match /doctors/{doctorId} {
+      allow get: if isSignedIn();
+      allow list: if isSignedIn();
+      allow create, update, delete: if isAdmin();
+    }
+
+    // 5. Appointments Collection
+    match /appointments/{appointmentId} {
+      allow get: if isSignedIn() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow list: if isSignedIn() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow create: if isSignedIn() &&
+                       isValidAppointment(incoming()) &&
+                       incoming().createdAt is timestamp &&
+                       incoming().createdAt <= request.time;
+      allow update: if (isOwner(existing().userId) || isAdmin()) &&
+                       incoming().userId == existing().userId &&
+                       incoming().createdAt == existing().createdAt &&
+                       isValidAppointment(incoming()) &&
+                       incoming().updatedAt is timestamp &&
+                       incoming().updatedAt <= request.time;
+      allow delete: if isOwner(existing().userId) || isAdmin();
+    }
+
+    // 6. Orders Collection
+    match /orders/{orderId} {
+      allow get: if isSignedIn() && (resource.data.buyerId == request.auth.uid || resource.data.sellerId == request.auth.uid || isAdmin());
+      allow list: if isSignedIn() && (resource.data.buyerId == request.auth.uid || resource.data.sellerId == request.auth.uid || isAdmin());
+      allow create: if isSignedIn() &&
+                       isValidOrder(incoming()) &&
+                       incoming().createdAt is timestamp &&
+                       incoming().createdAt <= request.time;
+      allow update: if isSignedIn() && (existing().buyerId == request.auth.uid || existing().sellerId == request.auth.uid || isAdmin()) &&
+                       incoming().buyerId == existing().buyerId &&
+                       incoming().sellerId == existing().sellerId &&
+                       incoming().createdAt == existing().createdAt &&
+                       isValidOrder(incoming()) &&
+                       incoming().updatedAt is timestamp &&
+                       incoming().updatedAt <= request.time;
+      allow delete: if isAdmin();
+    }
+
+    // 7. Conversations Collection
+    match /conversations/{conversationId} {
+      allow get: if isSignedIn() && (resource.data.buyerId == request.auth.uid || resource.data.sellerId == request.auth.uid || isAdmin());
+      allow list: if isSignedIn() && (resource.data.buyerId == request.auth.uid || resource.data.sellerId == request.auth.uid || isAdmin());
+      allow create: if isSignedIn() &&
+                       isValidConversation(incoming()) &&
+                       incoming().createdAt is timestamp &&
+                       incoming().createdAt <= request.time;
+      allow update: if isSignedIn() && (existing().buyerId == request.auth.uid || existing().sellerId == request.auth.uid || isAdmin()) &&
+                       incoming().createdAt == existing().createdAt &&
+                       isValidConversation(incoming());
+      allow delete: if isAdmin();
+
+      // Messages Subcollection
+      match /messages/{messageId} {
+        allow read: if isSignedIn() && (
+          get(/databases/$(database)/documents/conversations/$(conversationId)).data.buyerId == request.auth.uid ||
+          get(/databases/$(database)/documents/conversations/$(conversationId)).data.sellerId == request.auth.uid ||
+          isAdmin()
+        );
+        allow create: if isSignedIn() &&
+                         isValidMessage(incoming()) &&
+                         (
+                           get(/databases/$(database)/documents/conversations/$(conversationId)).data.buyerId == request.auth.uid ||
+                           get(/databases/$(database)/documents/conversations/$(conversationId)).data.sellerId == request.auth.uid ||
+                           isAdmin()
+                         ) &&
+                         incoming().createdAt is timestamp &&
+                         incoming().createdAt <= request.time;
+        allow update, delete: if isAdmin();
+      }
+    }
+  }
+}

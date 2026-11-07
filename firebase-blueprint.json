@@ -1,0 +1,213 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "User profile with breeder status and verification details",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "description": "Google Auth UID" },
+        "email": { "type": "string", "description": "User email address" },
+        "displayName": { "type": "string", "description": "User display name" },
+        "photoUrl": { "type": "string", "description": "Profile picture URL" },
+        "loftName": { "type": "string", "description": "Breeder's loft name" },
+        "isBreeder": { "type": "boolean", "description": "Whether user operates a breeder loft" },
+        "isVerifiedBreeder": { "type": "boolean", "description": "Breeder verification status by admin" },
+        "location": { "type": "string", "description": "City, Country or Region" },
+        "bio": { "type": "string", "description": "Bio or loft history" },
+        "phone": { "type": "string", "description": "Contact phone number" },
+        "subscriptionTier": { "type": "string", "description": "Free, Premium, or Pro" },
+        "isAdmin": { "type": "boolean", "description": "Platform administrator flag" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Creation timestamp via serverTimestamp" },
+        "updatedAt": { "type": "string", "format": "date-time", "description": "Update timestamp via serverTimestamp" }
+      },
+      "required": ["userId", "email", "displayName", "createdAt"]
+    },
+    "Pigeon": {
+      "title": "Pigeon",
+      "description": "Pigeon listing or inventory item with pedigree, ring and health records",
+      "type": "object",
+      "properties": {
+        "sellerId": { "type": "string", "description": "User ID of the seller/breeder" },
+        "sellerName": { "type": "string", "description": "Seller display name" },
+        "sellerLoft": { "type": "string", "description": "Seller loft name" },
+        "title": { "type": "string", "description": "Listing title" },
+        "breed": { "type": "string", "description": "Pigeon breed (e.g. Racing Homer, Fantail, Jacobin)" },
+        "gender": { "type": "string", "description": "Cock, Hen, or Pair" },
+        "ringNumber": { "type": "string", "description": "Official leg band/ring code" },
+        "birthYear": { "type": "integer", "description": "Year of birth / hatch" },
+        "colorMorph": { "type": "string", "description": "Feather color pattern (e.g. Blue Bar, Mealy, Grizzle)" },
+        "price": { "type": "number", "description": "Price in USD" },
+        "location": { "type": "string", "description": "Loft location" },
+        "description": { "type": "string", "description": "Detailed notes, lineage, race wins" },
+        "imageUrl": { "type": "string", "description": "Main photo URL" },
+        "videoUrl": { "type": "string", "description": "Optional flight or showcase video URL" },
+        "status": { "type": "string", "description": "available, reserved, or sold" },
+        "vaccinated": { "type": "boolean", "description": "Paramyxovirus & Pox vaccinated" },
+        "pedigreeAvailable": { "type": "boolean", "description": "Pedigree certificate available" },
+        "healthStatus": { "type": "string", "description": "Clinical health condition, e.g. Vaccinated (PMV-1 & Pox), Vet Cleared" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Creation timestamp" },
+        "updatedAt": { "type": "string", "format": "date-time", "description": "Update timestamp" }
+      },
+      "required": ["sellerId", "title", "breed", "price", "status", "createdAt"]
+    },
+    "Store": {
+      "title": "Store",
+      "description": "Personal online Pigeon Store / Loft profile",
+      "type": "object",
+      "properties": {
+        "ownerId": { "type": "string", "description": "Owner user ID" },
+        "ownerName": { "type": "string", "description": "Owner name" },
+        "storeName": { "type": "string", "description": "Store or Loft name" },
+        "tagline": { "type": "string", "description": "Short slogan" },
+        "description": { "type": "string", "description": "Store about info and heritage" },
+        "location": { "type": "string", "description": "Loft location" },
+        "city": { "type": "string", "description": "City or Metro Hub" },
+        "stateRegion": { "type": "string", "description": "State or Province" },
+        "distanceKm": { "type": "number", "description": "Distance in km from user / center" },
+        "pincode": { "type": "string", "description": "Postal pincode" },
+        "upiId": { "type": "string", "description": "Breeder UPI ID for direct escrow verification" },
+        "acceptsInrUpi": { "type": "boolean", "description": "Accepts Indian Rupee / UPI payments" },
+        "bannerUrl": { "type": "string", "description": "Store banner image URL" },
+        "logoUrl": { "type": "string", "description": "Store emblem / logo URL" },
+        "verified": { "type": "boolean", "description": "Verified store badge" },
+        "totalSales": { "type": "integer", "description": "Completed bird transactions" },
+        "rating": { "type": "number", "description": "Rating score out of 5" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Store creation date" },
+        "updatedAt": { "type": "string", "format": "date-time", "description": "Store last update date" }
+      },
+      "required": ["ownerId", "storeName", "createdAt"]
+    },
+    "Doctor": {
+      "title": "Doctor",
+      "description": "Verified pigeon avian veterinarian",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "description": "Veterinarian full name" },
+        "title": { "type": "string", "description": "Professional title (e.g. DVM, Avian Specialist)" },
+        "qualification": { "type": "string", "description": "Degrees & certifications" },
+        "experienceYears": { "type": "integer", "description": "Years specializing in pigeons" },
+        "fee": { "type": "number", "description": "Consultation fee in USD" },
+        "rating": { "type": "number", "description": "Rating score out of 5" },
+        "clinicLocation": { "type": "string", "description": "Clinic address / City" },
+        "availableDays": { "type": "string", "description": "Working days" },
+        "avatarUrl": { "type": "string", "description": "Doctor portrait URL" }
+      },
+      "required": ["name", "title", "fee"]
+    },
+    "Appointment": {
+      "title": "Appointment",
+      "description": "Doctor consultation appointment booking",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "description": "Fancier / Owner user ID" },
+        "userName": { "type": "string", "description": "Owner name" },
+        "doctorId": { "type": "string", "description": "Doctor identifier" },
+        "doctorName": { "type": "string", "description": "Doctor name" },
+        "specialty": { "type": "string", "description": "Medical specialty" },
+        "date": { "type": "string", "description": "Appointment date YYYY-MM-DD" },
+        "timeSlot": { "type": "string", "description": "Time slot (e.g. 10:00 AM)" },
+        "consultType": { "type": "string", "description": "Video Call, Clinic Visit, or Loft Inspection" },
+        "fee": { "type": "number", "description": "Consultation fee" },
+        "notes": { "type": "string", "description": "Pigeon symptoms or health concern notes" },
+        "status": { "type": "string", "description": "pending, confirmed, completed, cancelled" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Booking timestamp" },
+        "updatedAt": { "type": "string", "format": "date-time", "description": "Update timestamp" }
+      },
+      "required": ["userId", "doctorId", "date", "timeSlot", "status", "createdAt"]
+    },
+    "Order": {
+      "title": "Order",
+      "description": "Pigeon purchase order and escrow payment record",
+      "type": "object",
+      "properties": {
+        "buyerId": { "type": "string", "description": "Buyer user ID" },
+        "buyerName": { "type": "string", "description": "Buyer name" },
+        "sellerId": { "type": "string", "description": "Seller user ID" },
+        "pigeonId": { "type": "string", "description": "Purchased pigeon ID" },
+        "pigeonTitle": { "type": "string", "description": "Title of pigeon" },
+        "amount": { "type": "number", "description": "Total price with escrow in USD" },
+        "currency": { "type": "string", "description": "Currency code (INR or USD)" },
+        "inrAmount": { "type": "number", "description": "Total amount in Indian Rupees (INR)" },
+        "paymentMethod": { "type": "string", "description": "UPI Escrow, RuPay, NetBanking, PigeonPay" },
+        "upiTransactionId": { "type": "string", "description": "UPI transaction / reference ID" },
+        "securityVerificationCode": { "type": "string", "description": "6-digit OTP for secure bird delivery handover" },
+        "escrowStatus": { "type": "string", "description": "held_in_rbi_escrow, released_to_seller, refunded" },
+        "status": { "type": "string", "description": "placed, escrow_held, transport_booked, delivered, completed" },
+        "deliveryAddress": { "type": "string", "description": "Delivery address or Loft pickup" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Order creation date" },
+        "updatedAt": { "type": "string", "format": "date-time", "description": "Order update date" }
+      },
+      "required": ["buyerId", "sellerId", "pigeonId", "amount", "status", "createdAt"]
+    },
+    "Conversation": {
+      "title": "Conversation",
+      "description": "Chat channel between buyer and seller",
+      "type": "object",
+      "properties": {
+        "participantIds": { "type": "string", "description": "Colon-separated participant IDs" },
+        "buyerId": { "type": "string", "description": "Buyer user ID" },
+        "buyerName": { "type": "string", "description": "Buyer user name" },
+        "sellerId": { "type": "string", "description": "Seller user ID" },
+        "sellerName": { "type": "string", "description": "Seller / Breeder loft name" },
+        "pigeonId": { "type": "string", "description": "Associated pigeon ID" },
+        "pigeonTitle": { "type": "string", "description": "Pigeon title" },
+        "pigeonBreed": { "type": "string", "description": "Pigeon breed name" },
+        "pigeonPrice": { "type": "number", "description": "Pigeon price in USD" },
+        "lastMessage": { "type": "string", "description": "Latest message excerpt" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Conversation start" },
+        "updatedAt": { "type": "string", "format": "date-time", "description": "Last activity" }
+      },
+      "required": ["buyerId", "sellerId", "createdAt"]
+    },
+    "Message": {
+      "title": "Message",
+      "description": "Individual chat message with negotiation and offer support",
+      "type": "object",
+      "properties": {
+        "conversationId": { "type": "string", "description": "Parent conversation ID" },
+        "senderId": { "type": "string", "description": "Message sender user ID" },
+        "senderName": { "type": "string", "description": "Message sender name" },
+        "text": { "type": "string", "description": "Message body" },
+        "messageType": { "type": "string", "description": "Message kind: text, offer, inquiry" },
+        "offerAmount": { "type": "number", "description": "Optional offer amount in USD" },
+        "isBreeder": { "type": "boolean", "description": "Whether sender is verified breeder" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Message timestamp" }
+      },
+      "required": ["conversationId", "senderId", "text", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/User" },
+      "description": "User profiles and breeder loft accounts"
+    },
+    "/pigeons/{pigeonId}": {
+      "schema": { "$ref": "#/entities/Pigeon" },
+      "description": "Pigeon listings and loft inventory"
+    },
+    "/stores/{storeId}": {
+      "schema": { "$ref": "#/entities/Store" },
+      "description": "Personal online Pigeon Stores"
+    },
+    "/doctors/{doctorId}": {
+      "schema": { "$ref": "#/entities/Doctor" },
+      "description": "Verified avian veterinarians"
+    },
+    "/appointments/{appointmentId}": {
+      "schema": { "$ref": "#/entities/Appointment" },
+      "description": "Veterinary consultation appointments"
+    },
+    "/orders/{orderId}": {
+      "schema": { "$ref": "#/entities/Order" },
+      "description": "Pigeon purchase orders and escrow transactions"
+    },
+    "/conversations/{conversationId}": {
+      "schema": { "$ref": "#/entities/Conversation" },
+      "description": "Buyer-seller chat threads"
+    },
+    "/conversations/{conversationId}/messages/{messageId}": {
+      "schema": { "$ref": "#/entities/Message" },
+      "description": "Chat messages within a conversation"
+    }
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "name": "Pigeonverse",
+  "description": "The premier luxury marketplace, inventory manager, breeder store network and avian healthcare platform exclusively for pigeon species.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
